@@ -24,6 +24,8 @@ use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\Actions;
 use Filament\Forms\Components\Placeholder;
 use Filament\Notifications\Notification;
+use Webbingbrasil\FilamentCopyActions\Tables\Actions\CopyAction;
+use Webbingbrasil\FilamentCopyActions\Forms\Actions\CopyAction as FormCopyAction;
 
 class ApplicationResource extends Resource
 {
@@ -60,11 +62,13 @@ class ApplicationResource extends Resource
                     ->default(true),
                 
                 Actions::make([
-                    Action::make('get_current_otp')
+                    FormCopyAction::make('get_current_otp')
                         ->label('Get Current OTP')
                         ->icon('heroicon-o-clock')
+                        ->copyable(fn ($record) => $record?->getTotpInstance()?->now() ?? '')
                         ->action(function ($record) {
                             if ($record) {
+                                // Generate fresh OTP for copying
                                 $totp = $record->getTotpInstance();
                                 $currentOtp = $totp->now();
                                 
@@ -75,13 +79,17 @@ class ApplicationResource extends Resource
                                 $expiresIn = $period - $timeInPeriod;
                                 $expiresAt = $currentTime + $expiresIn;
                                 
+                                // Add additional notification with OTP details (after the default "Copied!" message)
                                 Notification::make()
-                                    ->title('Current OTP Code')
-                                    ->body("OTP: {$currentOtp}\nExpires in: {$expiresIn} seconds\nExpires at: " . date('H:i:s', $expiresAt))
+                                    ->title("OTP: {$currentOtp}")
+                                    ->body("Expires in: {$expiresIn} seconds\nExpires at: " . date('H:i:s', $expiresAt))
                                     ->info()
-                                    ->persistent()
+                                    ->duration(5000)
                                     ->send();
+                                
+                                return $currentOtp;
                             }
+                            return '';
                         })
                         ->visible(fn ($record) => $record !== null && $record->secret),
                         
@@ -150,10 +158,12 @@ class ApplicationResource extends Resource
                     ->label('Active'),
             ])
             ->actions([
-                Tables\Actions\Action::make('get_otp')
+                CopyAction::make('get_otp')
                     ->label('Get OTP')
                     ->icon('heroicon-o-clock')
+                    ->copyable(fn ($record) => $record->getTotpInstance()->now())
                     ->action(function ($record) {
+                        // Generate fresh OTP for copying
                         $totp = $record->getTotpInstance();
                         $currentOtp = $totp->now();
                         
@@ -164,12 +174,15 @@ class ApplicationResource extends Resource
                         $expiresIn = $period - $timeInPeriod;
                         $expiresAt = $currentTime + $expiresIn;
                         
+                        // Add additional notification with OTP details (after the default "Copied!" message)
                         Notification::make()
-                            ->title('Current OTP Code')
-                            ->body("OTP: {$currentOtp}\nExpires in: {$expiresIn} seconds\nExpires at: " . date('H:i:s', $expiresAt))
+                            ->title("OTP: {$currentOtp}")
+                            ->body("Expires in: {$expiresIn} seconds\nExpires at: " . date('H:i:s', $expiresAt))
                             ->info()
-                            ->persistent()
+                            ->duration(5000)
                             ->send();
+                        
+                        return $currentOtp;
                     })
                     ->visible(fn ($record) => $record->secret && $record->is_active),
                 Tables\Actions\Action::make('test_otp')
