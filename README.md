@@ -204,6 +204,10 @@ docker compose run --rm artisan list
 - **🗃️ Database**: localhost:3306
 - **📊 Logs**: `docker compose logs -f`
 
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
 ---
 
 **Happy coding! 🎉** Your Laravel development environment is ready for action!
