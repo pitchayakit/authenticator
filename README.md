@@ -1,123 +1,209 @@
-# Laravel Docker Development Environment
+# Authenticator app
 
-A complete Docker setup for Laravel development with PHP 8.2, MySQL 8.0, and Nginx.
+🚀 **Get your Laravel application running in under 2 minutes!**
 
-## Features
+![Application Preview](doc/example.png)
 
-- **PHP 8.2** with FPM
-- **Laravel** (latest version)
-- **MySQL 8.0** database
-- **Nginx** web server
-- **Composer** for dependency management
-- Hot reload for development
+A complete, ready-to-use Docker setup for Laravel development with PHP 8.2, MySQL 8.0, and Nginx. No complex configuration needed!
 
-## Prerequisites
+## 🎯 What You Get
 
-- Docker & Docker Compose
+- ✅ **PHP 8.2** with all Laravel extensions
+- ✅ **MySQL 8.0** database (pre-configured)
+- ✅ **Nginx** web server
+- ✅ **Laravel** latest version
+- ✅ **Hot reload** for instant development
+- ✅ **One-command setup**
 
-## Quick Start
+## 🛠️ Prerequisites
 
-1. **Start the environment:**
-   ```bash
-   docker compose up -d
-   ```
+You only need:
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) installed and running
 
-2. **Access your application:**
-   - Application: http://localhost:8000
-   - MySQL: localhost:3306 (user: laravel, password: laravel, database: laravel)
+That's it! No need to install PHP, MySQL, or Nginx separately.
 
-## Available Commands
+## ⚡ Quick Start (2 minutes)
 
-**Basic Operations:**
+### Step 1: Start Everything
 ```bash
-# Start all services
+# Clone and start (or just start if already cloned)
+docker compose up -d
+```
+
+### Step 2: Install Dependencies
+```bash
+# Install Laravel dependencies
+docker compose run --rm composer install
+```
+
+### Step 3: Set Up Database
+```bash
+# Run database migrations
+docker compose run --rm artisan migrate
+```
+
+### Step 4: Open Your App
+🎉 **Your app is ready!** Open: http://localhost:8000
+
+## 🔧 Daily Development Commands
+
+### Laravel/Artisan Commands
+```bash
+# Create new controller
+docker compose run --rm artisan make:controller YourController
+
+# Create new model
+docker compose run --rm artisan make:model YourModel
+
+# Run migrations
+docker compose run --rm artisan migrate
+
+# Seed database
+docker compose run --rm artisan db:seed
+
+# Clear cache
+docker compose run --rm artisan cache:clear
+
+# Run tests
+docker compose run --rm artisan test
+
+# Access Laravel Tinker
+docker compose run --rm artisan tinker
+```
+
+### Composer Package Management
+```bash
+# Install new packages
+docker compose run --rm composer require vendor/package-name
+
+# Update all packages
+docker compose run --rm composer update
+
+# Install from composer.json
+docker compose run --rm composer install
+```
+
+### Docker Management
+```bash
+# Start services
 docker compose up -d
 
-# Stop all services
+# Stop services
 docker compose down
+
+# Restart services
+docker compose restart
 
 # View logs
 docker compose logs -f
 
-# View status
+# Check service status
 docker compose ps
 ```
 
-**Laravel/Artisan Commands:**
-```bash
-# Run any artisan command
-docker compose run --rm artisan [command]
+## 🗄️ Database Access
 
-# Examples:
-docker compose run --rm artisan migrate
-docker compose run --rm artisan make:controller HomeController
-docker compose run --rm artisan tinker
-docker compose run --rm artisan test
+**From your application:** Already configured! Laravel will connect automatically.
+
+**Direct access:**
+```bash
+# Connect to MySQL shell
+docker compose exec mysql mysql -u laravel -p laravel
+# Password: laravel
 ```
 
-**Composer Commands:**
+**External tools (phpMyAdmin, etc.):**
+- Host: `localhost`
+- Port: `3306`
+- Database: `laravel`
+- Username: `laravel`
+- Password: `laravel`
+
+## 🔍 Container Details
+
+| Service | Container | Purpose | Port |
+|---------|-----------|---------|------|
+| **app** | laravel_app | PHP 8.2 Application | - |
+| **nginx** | laravel_nginx | Web Server | 8000 |
+| **mysql** | laravel_mysql | Database | 3306 |
+| **composer** | laravel_composer | Package Manager | - |
+| **artisan** | laravel_artisan | Laravel CLI | - |
+
+## 🚀 Advanced Usage
+
+### Access Container Shell
 ```bash
-# Install packages
-docker compose run --rm composer install
-
-# Add new packages
-docker compose run --rm composer require package/name
-
-# Update packages
-docker compose run --rm composer update
-```
-
-**Container Access:**
-```bash
-# Access application shell
+# Access app container for debugging
 docker compose exec app bash
 
-# Access MySQL
-docker compose exec mysql mysql -u laravel -p laravel
+# Access database container
+docker compose exec mysql bash
 ```
 
-## Services
+### Environment Configuration
+Edit `.env` file in your project root to customize:
+- Database credentials
+- Application settings
+- Debug modes
 
-### Application (app)
-- **Container**: laravel_app
-- **PHP**: 8.2-fpm
-- **Extensions**: PDO MySQL, mbstring, exif, pcntl, bcmath, gd, zip
+### Custom PHP Configuration
+Modify `docker/php/php.ini` for custom PHP settings.
 
-### Web Server (nginx)
-- **Container**: laravel_nginx
-- **Port**: 8000
+## 🆘 Troubleshooting
 
-### Database (mysql)
-- **Container**: laravel_mysql
-- **Port**: 3306
-- **Database**: laravel
-- **Username**: laravel
-- **Password**: laravel
+### Port 8000 Already in Use?
+```bash
+# Stop the conflicting service or use different port
+docker compose down
+# Edit docker-compose.yml to change port from 8000 to 8080
+```
 
-### Composer & Artisan
-- **Container**: laravel_composer (for composer commands)
-- **Container**: laravel_artisan (for artisan commands)
+### Permission Issues?
+```bash
+# Fix Laravel storage permissions
+docker compose exec app chown -R www-data:www-data storage bootstrap/cache
+docker compose exec app chmod -R 775 storage bootstrap/cache
+```
 
-## Development Workflow
+### Can't Connect to Database?
+```bash
+# Restart MySQL container
+docker compose restart mysql
 
-1. **Start the environment:**
-   ```bash
-   docker compose up -d
-   ```
+# Check if MySQL is running
+docker compose exec mysql mysql -u laravel -p laravel -e "SELECT 1"
+```
 
-2. **Install/update dependencies:**
-   ```bash
-   docker compose run --rm composer install
-   ```
+### Fresh Start?
+```bash
+# Complete reset (⚠️ This will delete your database!)
+docker compose down -v
+docker compose up -d
+docker compose run --rm composer install
+docker compose run --rm artisan migrate
+```
 
-3. **Run migrations:**
-   ```bash
-   docker compose run --rm artisan migrate
-   ```
+## 🎓 New to Laravel?
 
-4. **Access application shell for development:**
-   ```bash
-   docker compose exec app bash
-   ```
+After setup, try these commands to explore:
 
-Your Laravel development environment is ready to use! The application will auto-reload when you make changes to your code.
+```bash
+# Create your first route
+docker compose run --rm artisan make:controller WelcomeController
+
+# Create a model with migration
+docker compose run --rm artisan make:model Post -m
+
+# View all available artisan commands
+docker compose run --rm artisan list
+```
+
+## 📱 Access Points
+
+- **🌐 Application**: http://localhost:8000
+- **🗃️ Database**: localhost:3306
+- **📊 Logs**: `docker compose logs -f`
+
+---
+
+**Happy coding! 🎉** Your Laravel development environment is ready for action!

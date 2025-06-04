@@ -133,11 +133,6 @@ class ApplicationResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('user.name')
-                    ->label('User')
-                    ->sortable()
-                    ->searchable(),
-                    
                 TextColumn::make('name')
                     ->label('Application Name')
                     ->searchable()
